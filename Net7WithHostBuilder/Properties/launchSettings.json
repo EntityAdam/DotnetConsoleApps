@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Net7WithHostBuilder": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
