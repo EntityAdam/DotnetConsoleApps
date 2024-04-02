@@ -47,7 +47,6 @@ internal static class Kaprekar
         if (input is null) return false;
         if (input.Length != 4) return false;
         if (!int.TryParse(input, out int _)) return false;
-        var test = input.ToCharArray().Distinct().Count();
         if (input.ToCharArray().Distinct().Count() < 2) return false;
         return true;
     }
