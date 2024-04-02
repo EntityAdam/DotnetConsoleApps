@@ -14,7 +14,7 @@ internal static class Kaprekar
     {
         string result = string.Empty;
         bool isValid = false;
-        while(!isValid)
+        while (!isValid)
         {
             Console.Write("Enter 4 digit number: ");
             string? input = Console.ReadLine();
@@ -31,6 +31,17 @@ internal static class Kaprekar
         return result;
     }
 
+    public static void Calculate(string input)
+    {
+        char[] x = input.ToCharArray();
+        string desc = string.Concat(x.OrderByDescending(c => c));
+        string asc = string.Concat(x.OrderBy(c => c));
+        int result = int.Parse(desc) - int.Parse(asc);
+        Print(desc, asc, result);
+        if (result != 6174m) { Calculate(result.ToString("0000")); }
+        else { Console.WriteLine("done!"); }
+    }
+
     private static bool ValidateInput(string? input)
     {
         if (input is null) return false;
@@ -39,18 +50,6 @@ internal static class Kaprekar
         var test = input.ToCharArray().Distinct().Count();
         if (input.ToCharArray().Distinct().Count() < 2) return false;
         return true;
-    }
-
-    public static void Calculate(string input)
-    {
-        char[] x = input.ToCharArray();
-        string desc = string.Concat(x.OrderByDescending(c => c));
-        string asc = string.Concat(x.OrderBy(c => c));
-        int result = int.Parse(desc) - int.Parse(asc);
-        Print(desc, asc, result);
-        //if (result < 1000m) { PrintInvalidInput(); }
-        if (result != 6174m) { Calculate(result.ToString("0000")); }
-        else { Console.WriteLine("done!"); }
     }
 
     private static void PrintInvalidInput()
