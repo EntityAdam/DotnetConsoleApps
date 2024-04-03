@@ -6,9 +6,9 @@ namespace RecordTypeBreakdown;
 
 public class Example01
 {
+    internal sealed class Dog(string Name, int Age);
     internal sealed record Pig(string Name, int Age) : EmptyRecordBase;
     internal sealed record Hamster(string Name, int Age) : EmptyRecordBase;
-
     internal sealed class Elephant : IEquatable<Elephant>
     {
         public Elephant(string Name, int Age)
@@ -95,7 +95,6 @@ public class Example01
         }
 
     }
-
     internal sealed class Cat : ValueObject
     {
         public Cat(string Name, int Age)
@@ -113,7 +112,6 @@ public class Example01
             yield return Age;
         }
     }
-
     internal sealed class Rat : ValueObject
     {
         public Rat(string Name, int Age)
@@ -131,16 +129,15 @@ public class Example01
             yield return Age;
         }
     }
-
     public static void AssertEquals()
     {
-        //Dog frog1 = new Dog("Frog", 1);
-        //Dog frog2 = new Dog("Frog", 1);
-        //Debug.Assert(frog1 != frog2, "Reference types should not be value equal");
+        Dog dog1 = new Dog("Dog", 1);
+        Dog dog2 = new Dog("Dog", 1);
+        Debug.Assert(dog1 != dog2, "Reference types should not be value equal");
 
-        Elephant dog1 = new Elephant("Dog", 1);
-        Elephant dog2 = new Elephant("Dog", 1);
-        Debug.Assert(dog1 == dog2, "Records should be value equal");
+        Elephant elephant1 = new Elephant("Elephant", 1);
+        Elephant elephant2 = new Elephant("Elephant", 1);
+        Debug.Assert(elephant1 == elephant2, "Records should be value equal");
 
         Cat cat1 = new Cat("Cat", 1);
         Cat cat2 = new Cat("Cat", 1);
@@ -154,54 +151,6 @@ public class Example01
         Pig pig = new Pig("Frank", 1);
         Hamster hamster = new Hamster("Frank", 1);
         Debug.Assert(pig != hamster, "All record types derived from a record should be the same type and value equal");
-    }
-}
-
-public abstract class ValueObject
-{
-    public static bool operator ==(ValueObject one, ValueObject two)
-    {
-        return EqualOperator(one, two);
-    }
-
-    public static bool operator !=(ValueObject one, ValueObject two)
-    {
-        return NotEqualOperator(one, two);
-    }
-
-    protected static bool EqualOperator(ValueObject left, ValueObject right)
-    {
-        if (ReferenceEquals(left, null) ^ ReferenceEquals(right, null))
-        {
-            return false;
-        }
-        return ReferenceEquals(left, null) || left.Equals(right);
-    }
-
-    protected static bool NotEqualOperator(ValueObject left, ValueObject right)
-    {
-        return !(EqualOperator(left, right));
-    }
-
-    protected abstract IEnumerable<object> GetEqualityComponents();
-
-    public override bool Equals(object obj)
-    {
-        if (obj == null || obj.GetType() != GetType())
-        {
-            return false;
-        }
-
-        var other = (ValueObject)obj;
-
-        return this.GetEqualityComponents().SequenceEqual(other.GetEqualityComponents());
-    }
-
-    public override int GetHashCode()
-    {
-        return GetEqualityComponents()
-            .Select(x => x != null ? x.GetHashCode() : 0)
-            .Aggregate((x, y) => x ^ y);
     }
 }
 
