@@ -1,79 +1,123 @@
-﻿using Newtonsoft.Json;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-
-var x = new ResourceTypeCodeBillabilityMap()
+﻿// domain abstractions
+public interface IFacade
 {
-    Map = new List<ResourceTypeCodeBillability>
+    public Task PersonNew(Person person);
+    public Task PersonChangeName(Person person, string name);
+    public Task PersonRecordDeath(Person person, DateOnly date);
+
+    Task PlaceNew(Place place);
+    Task PlaceChangeAddress(Place place);
+    Task PlaceDemolished(Place place);
+
+    Task ResidencyNew(Person person, Place place);
+    Task ResidencyChange(Person person, Place newPlace);
+}
+public interface IPeopleStore
+{
+    Task ChangeName(Person person, string name);
+    Task New(Person person);
+}
+public interface IPlaceStore { }
+public interface IResidencyStore { }
+
+// domain impl
+internal sealed class Facade : IFacade
+{
+    private readonly IPeopleStore peopleStore;
+    private readonly IPlaceStore placeStore;
+    private readonly IResidencyStore residencyStore;
+
+    public Facade(IPeopleStore peopleStore, IPlaceStore placeStore, IResidencyStore residencyStore)
     {
-        new() { ResourceTypeCodeName = "Billable Resource", ResourceTypeCode = "Billable", TargetBillability = 95m },
-        new() { ResourceTypeCodeName = "Billable Manager", ResourceTypeCode = "BillableManager", TargetBillability = 50m },
-        new() { ResourceTypeCodeName = "Billable Subcontractor", ResourceTypeCode = "BillableSub", TargetBillability = 100m },
-        new() { ResourceTypeCodeName = "Non-Billable Resource", ResourceTypeCode = "NonBillable", TargetBillability = 0m },
-        new() { ResourceTypeCodeName = "Billability Target 40%", ResourceTypeCode = "BT40", TargetBillability = 40m },
-        new() { ResourceTypeCodeName = "Billability Target 72%", ResourceTypeCode = "BT72", TargetBillability = 72m },
-        new() { ResourceTypeCodeName = "Billability Target 87%", ResourceTypeCode = "BT87", TargetBillability = 87m },
-        new() { ResourceTypeCodeName = "Billability Target 93%", ResourceTypeCode = "BT93", TargetBillability = 93m },
-        new() { ResourceTypeCodeName = "Billability Target 95%", ResourceTypeCode = "BT95", TargetBillability = 95m },
-        new() { ResourceTypeCodeName = "Billable Contractor", ResourceTypeCode = "BC", TargetBillability = 95m },
-        new() { ResourceTypeCodeName = "Billable IDC", ResourceTypeCode = "BIDC95", TargetBillability = 95m },
-        new() { ResourceTypeCodeName = "Billability Target 0%", ResourceTypeCode = "BT00", TargetBillability = 0m },
+        this.peopleStore = peopleStore;
+        this.placeStore = placeStore;
+        this.residencyStore = residencyStore;
     }
-};
-
-var y = new ResourceTypeCodeBillabilityMap2()
-{
-    Map = new Dictionary<string, decimal>
+    public async Task PersonChangeName(Person person, string name)
     {
-        { "Billable", 95m },
-        { "BillableManager", 50m },
-        { "BillableSub", 100m },
-        { "NonBillable", 0m },
-        { "BT40", 40m },
-        { "BT72", 72m },
-        { "BT87", 87m },
-        { "BT93", 93m },
-        { "BT95", 95m },
-        { "BC", 95m },
-        { "BIDC95", 95m },
-        { "BT00", 0m },
+        await peopleStore.ChangeName(person, name);
     }
-};
 
-var serialized = System.Text.Json.JsonSerializer.Serialize(x);
-var serialized1 = System.Text.Json.JsonSerializer.Serialize(y);
-var serialized2 = JsonConvert.SerializeObject(y);
-Console.WriteLine(JsonConvert.SerializeObject(y));
+    public async Task PersonNew(Person person)
+    {
+        if (!Person.IsValid(person)) { throw new ArgumentException(nameof(Person)); }
+        await peopleStore.New(person);
+    }
 
-File.WriteAllText(@"C:\temp\map.json", serialized);
-File.WriteAllText(@"C:\temp\map1.json", serialized1);
-File.WriteAllText(@"C:\temp\map2.json", serialized2);
+    public Task PersonRecordDeath(Person person, DateOnly date) => throw new NotImplementedException();
 
-var deserialized1 = JsonConvert.DeserializeObject<ResourceTypeCodeBillabilityMap2>(File.ReadAllText(@"C:\temp\map1.json"));
-var deserialized2 = System.Text.Json.JsonSerializer.Deserialize<ResourceTypeCodeBillabilityMap2>(File.ReadAllText(@"C:\temp\map1.json"));
-var deserialized3 = JsonConvert.DeserializeObject<ResourceTypeCodeBillabilityMap2>(File.ReadAllText(@"C:\temp\map1.json"));
-Console.WriteLine("done");
+    public Task PlaceChangeAddress(Place place) => throw new NotImplementedException();
 
-var yy = deserialized3.Map.ContainsKey("BT00");
-var zz = deserialized3.Map.ContainsKey("FOOP");
-var x2 = deserialized3.Map["BT00"];
-var x3 = deserialized3.Map["FOOP"]; 
+    public Task PlaceDemolished(Place place) => throw new NotImplementedException();
 
+    public Task PlaceNew(Place place) => throw new NotImplementedException();
 
+    public Task ResidencyChange(Person person, Place newPlace) => throw new NotImplementedException();
 
-public class ResourceTypeCodeBillabilityMap
-{
-    public List<ResourceTypeCodeBillability> Map { get; set; } = new List<ResourceTypeCodeBillability>();
+    public Task ResidencyNew(Person person, Place place) => throw new NotImplementedException();
 }
-
-public class ResourceTypeCodeBillabilityMap2
+internal sealed class PeopleStore : IPeopleStore
 {
-    public Dictionary<string, decimal> Map { get; set; } = new();
-}
+    public Task ChangeName(Person person, string name)
+    {
+        throw new NotImplementedException();
+    }
 
-public class ResourceTypeCodeBillability
-{
-    public string ResourceTypeCodeName { get; set; } = string.Empty;
-    public string ResourceTypeCode { get; set; } = string.Empty;
-    public decimal TargetBillability { get; set; }
+    public Task New(Person person)
+    {
+        throw new NotImplementedException();
+    }
 }
+internal sealed class PlaceStore : IPlaceStore { }
+
+//unit tests
+//[InternalsVisibleTo()]
+public class PeopleStoreDummy : IPeopleStore
+{
+    public Task ChangeName(Person person, string name)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task New(Person person)
+    {
+        throw new NotImplementedException();
+    }
+}
+public class PeopleStoreMock : IPeopleStore
+{
+    private List<Person> _people { get; set; } = new List<Person>();
+
+    public Task ChangeName(Person person, string name)
+    {
+        var personToChange = _people.Single(p => p.Id == person.Id);
+        personToChange.Name = name;
+        return Task.CompletedTask;
+    }
+
+    public Task New(Person person)
+    {
+        throw new NotImplementedException();
+    }
+}
+public class PlaceStoreDummy : IPlaceStore { }
+public class PlaceStoreMock : IPlaceStore { }
+
+
+
+public sealed class Employee { }
+public sealed class Person
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+
+    internal static bool IsValid(Person person)
+    {
+        return !string.IsNullOrEmpty(person.Name);
+    }
+}
+public sealed class Place { }
+public sealed class City { }
+public sealed class State { }
+public sealed class Country { }
+public sealed class Residency { }
